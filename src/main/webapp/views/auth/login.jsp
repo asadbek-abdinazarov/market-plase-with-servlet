@@ -15,10 +15,18 @@
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control" id="email" name="email">
+                    <span class="text-danger">
+                        <c:if test="${email_error != null}">
+                            <span class="text-danger">${email_error}</span>
+                        </c:if>
+                    </span>
                 </div>
                 <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password">
+                    <c:if test="${password_error != null}">
+                        <span class="text-danger">${password_error}</span>
+                    </c:if>
                 </div>
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="rememberMe">
