@@ -17,6 +17,7 @@ public class Product extends BaseEntity {
     private String prodName;
     private String prodType;
     private String prodDesc;
+    private String unit;
+    private Integer amount;
     private Double prodPrice;
-    private Integer prodStock;
 }

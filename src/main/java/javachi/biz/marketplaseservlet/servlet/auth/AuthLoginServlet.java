@@ -6,6 +6,7 @@ import jakarta.persistence.Persistence;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,11 +14,11 @@ import javachi.biz.marketplaseservlet.dao.AuthUserDAO;
 import javachi.biz.marketplaseservlet.entity.AuthUser;
 import javachi.biz.marketplaseservlet.utils.PasswordUtils;
 import javachi.biz.marketplaseservlet.utils.StringUtils;
-import org.postgresql.util.PasswordUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @WebServlet(name = "AuthLoginServlet", value = "/auth/login")
 public class AuthLoginServlet extends HttpServlet {
@@ -31,35 +32,39 @@ public class AuthLoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        /*Berilgan email bor bolsa uning passwordi bilan tekshiradi
-         * Agar data baseda bunday email email not found chiqarish kerak
-         * Agar bolsa Home pagega redirect */
-        /*EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("jpa_unit");
-        EntityManager entityManager = entityManagerFactory.createEntityManager();*/
         String email = req.getParameter("email");
         String password = req.getParameter("password");
-        /*entityManager.getTransaction().begin();
-        AuthUser authUser = entityManager.find(AuthUser.class, email);
-        entityManager.getTransaction().commit();*/
-
 
         Map<String, String> errors = new HashMap<>();
 
-        if (!StringUtils.isEmailValid(email)) {
+        if (email == null || !StringUtils.isEmailValid(email)) {
             errors.put("email_error", "Invalid email");
         }
-        if (PasswordUtils.checkPassword(password, authUserDAO.findByEmail(email).get().getPassword())) {
-            resp.sendRedirect("/home");
-        }else {
-            errors.put("password_error", "Invalid password");
+
+        Optional<AuthUser> optionalUser = authUserDAO.findByEmail(email);
+        if (optionalUser.isPresent()) {
+            AuthUser user = optionalUser.get();
+            if (!PasswordUtils.checkPassword(password, user.getPassword())) {
+                errors.put("password_error", "Invalid password");
+            } else {
+                // Set user session if authenticated
+                req.getSession().setAttribute("user", email);
+                Cookie userCookie = new Cookie("user", email);
+                userCookie.setMaxAge(60 * 60 * 2);
+                userCookie.setPath("/");
+                resp.addCookie(userCookie);
+            }
+        } else {
+            errors.put("email_error", "Email not found");
         }
 
-        if (password.isBlank() || password.isEmpty()) {
+        if (password == null || password.isBlank()) {
             errors.put("password_error", "Password cannot be empty or null.");
         }
+
         if (!errors.isEmpty()) {
-            RequestDispatcher requestDispatcher = req.getRequestDispatcher("/views/auth/login.jsp");
             errors.forEach(req::setAttribute);
+            RequestDispatcher requestDispatcher = req.getRequestDispatcher("/views/auth/login.jsp");
             requestDispatcher.forward(req, resp);
         } else {
             resp.sendRedirect("/home");

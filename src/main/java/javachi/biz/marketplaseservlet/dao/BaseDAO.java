@@ -8,6 +8,7 @@ import javachi.biz.marketplaseservlet.entity.BaseEntity;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class BaseDAO<T extends BaseEntity, ID extends Serializable> {
@@ -15,12 +16,18 @@ public class BaseDAO<T extends BaseEntity, ID extends Serializable> {
     protected static final EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("marketPlace");
     protected static final EntityManager entityManager = entityManagerFactory.createEntityManager();
 
+
     private final Class<T> persistentClass;
 
     @SuppressWarnings("unchecked")
     public BaseDAO() {
-        this.persistentClass =
-                (Class<T>) (((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+        // This is the correct way to get the generic type
+        Type tType = getClass().getGenericSuperclass();
+        if (tType instanceof ParameterizedType parameterizedType) {
+            this.persistentClass = (Class<T>) parameterizedType.getActualTypeArguments()[0];
+        } else {
+            throw new RuntimeException("Class does not have a parameterized type.");
+        }
     }
 
     protected void begin() {

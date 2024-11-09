@@ -2,8 +2,10 @@ package javachi.biz.marketplaseservlet.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,21 +29,27 @@ public class SecurityFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-        String requestURI = request.getRequestURI();
-        System.out.println(requestURI);
-
-        /*for (String req : WHITE_LIST) {
-            if (!requestURI.equals(req)){
-                response.sendRedirect("/auth/login");
-            }else {
-                filterChain.doFilter(servletRequest, servletResponse);
+        String value = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("user".equals(cookie.getName())) {
+                    value = cookie.getValue();
+                    break;
+                }
             }
-        }*/
+        }
 
-        if (!isOpen.test(requestURI)) {
-            response.sendRedirect("/auth/login");
-        } else {
+        String requestURI = request.getRequestURI();
+        System.out.println("Request URI: " + requestURI);
+
+        if (isOpen.test(requestURI)) {
             filterChain.doFilter(servletRequest, servletResponse);
+        } else if (value != null) {
+            filterChain.doFilter(servletRequest, servletResponse);
+        } else {
+            response.sendRedirect("/auth/login");
         }
     }
 }
+
