@@ -21,6 +21,9 @@ public class AuthUser extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "authUser")
+    private Basket basket;
+
     public enum Status{
         ACTIVE,
         INACTIVE,

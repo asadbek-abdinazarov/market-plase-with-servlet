@@ -47,7 +47,6 @@ public class AuthLoginServlet extends HttpServlet {
             if (!PasswordUtils.checkPassword(password, user.getPassword())) {
                 errors.put("password_error", "Invalid password");
             } else {
-                // Set user session if authenticated
                 req.getSession().setAttribute("user", email);
                 Cookie userCookie = new Cookie("user", email);
                 userCookie.setMaxAge(60 * 60 * 2);

@@ -24,4 +24,20 @@ public class ProductDAO extends BaseDAO<Product, String> {
         return products;
     }
 
+    public List<Product> findAllByBasketId(String id) {
+        List<Product> products = new ArrayList<>();
+        try {
+            begin();
+            products = entityManager
+                    .createQuery("from Product where basket.id = :id", Product.class)
+                    .setParameter("id", id)
+                    .getResultList();
+            commit();
+            return products;
+        } catch (Exception e) {
+            rollback();
+            e.printStackTrace();
+        }
+        return products;
+    }
 }
