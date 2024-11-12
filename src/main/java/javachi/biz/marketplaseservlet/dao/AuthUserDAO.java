@@ -14,12 +14,12 @@ public class AuthUserDAO extends BaseDAO<AuthUser, String> {
             AuthUser user = entityManager.createQuery("SELECT u FROM AuthUser u where u.email ilike :email", AuthUser.class)
                     .setParameter("email", email)
                     .getSingleResult();
+            commit();
             return Optional.ofNullable(user);
         } catch (Exception e) {
             e.printStackTrace();
+            rollback();
             return Optional.empty();
-        } finally {
-            commit();
         }
     }
 

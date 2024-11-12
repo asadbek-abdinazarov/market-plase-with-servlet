@@ -11,17 +11,19 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Basket extends BaseEntity{
+public class Basket extends BaseEntity {
 
-    private String userId;
+    @OneToOne
+    @JoinColumn(name = "auth_user_id")
+    private AuthUser authUser;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "basket")
     private List<Product> products;
 
     @Builder(builderMethodName = "childBuilder")
-    public Basket(String id, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, String userId, List<Product> products) {
+    public Basket(String id, LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime deletedAt, AuthUser authUser, List<Product> products) {
         super(id, createdAt, updatedAt, deletedAt);
-        this.userId = userId;
+        this.authUser = authUser;
         this.products = products;
     }
 }

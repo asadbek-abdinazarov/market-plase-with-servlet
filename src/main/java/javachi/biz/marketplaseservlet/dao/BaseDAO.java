@@ -38,6 +38,11 @@ public class BaseDAO<T extends BaseEntity, ID extends Serializable> {
         entityManager.getTransaction().commit();
     }
 
+    protected void rollback() {
+        entityManager.getTransaction().rollback();
+    }
+
+
 
     public T save(T entity) {
         begin();

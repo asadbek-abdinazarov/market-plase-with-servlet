@@ -29,9 +29,9 @@ public class AuthRegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String email = req.getParameter("1email");
-        String password = req.getParameter("1password");
-        String confirm_password = req.getParameter("1confirm_password");
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
+        String confirm_password = req.getParameter("confirm_password");
         String firstname = req.getParameter("firstname");
         String lastname = req.getParameter("lastname");
 
