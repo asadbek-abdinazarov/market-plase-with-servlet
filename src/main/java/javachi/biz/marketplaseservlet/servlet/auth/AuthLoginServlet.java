@@ -47,11 +47,9 @@ public class AuthLoginServlet extends HttpServlet {
             if (!PasswordUtils.checkPassword(password, user.getPassword())) {
                 errors.put("password_error", "Invalid password");
             } else {
-                req.getSession().setAttribute("user", email);
-                Cookie userCookie = new Cookie("user", email);
-                userCookie.setMaxAge(60 * 60 * 2);
-                userCookie.setPath("/");
-                resp.addCookie(userCookie);
+                if (!user.getStatus().equals(AuthUser.Status.ACTIVE)) {
+                    errors.put("status_error", "User not verified email.");
+                }
             }
         } else {
             errors.put("email_error", "Email not found");

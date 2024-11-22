@@ -7,7 +7,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import javachi.biz.marketplaseservlet.dao.AuthUserDAO;
+import javachi.biz.marketplaseservlet.dao.VerifyEmailDAO;
 import javachi.biz.marketplaseservlet.entity.AuthUser;
+import javachi.biz.marketplaseservlet.entity.VerifyEmailEntity;
+import javachi.biz.marketplaseservlet.service.EmailService;
 import javachi.biz.marketplaseservlet.utils.PasswordUtils;
 import javachi.biz.marketplaseservlet.utils.StringUtils;
 
@@ -16,10 +19,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 @WebServlet(name = "AuthRegisterServlet", value = "/auth/register")
 public class AuthRegisterServlet extends HttpServlet {
     private final AuthUserDAO authUserDAO = new AuthUserDAO();
+    private final VerifyEmailDAO verifyEmailDAO = new VerifyEmailDAO();
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -65,13 +71,33 @@ public class AuthRegisterServlet extends HttpServlet {
                     .password(PasswordUtils.encode(password))
                     .firstName(firstname)
                     .lastName(lastname)
-                    .status(AuthUser.Status.ACTIVE)
+                    .status(AuthUser.Status.INACTIVE)
                     .createdAt(LocalDateTime.now())
-                    .role("ROLE_USER")
+                    .role("USER")
                     .build();
-
             authUserDAO.save(user);
-            resp.sendRedirect("/auth/login");
+            String subject = "Verify Email";
+            String code = generateVerificationCode();
+            String message = "Please verify your email address and your password is " + code;
+            try {
+                EmailService.sendEmail(email, subject, message);
+                resp.getWriter().write("Email sent successfully!");
+            } catch (Exception e) {
+                resp.getWriter().write("Error while sending email: " + e.getMessage());
+            }
+
+            verifyEmailDAO.save(VerifyEmailEntity.childBuilder()
+                    .email(email)
+                    .verifyCode(code)
+                    .build());
+            req.getSession().setAttribute("user", email);
+            resp.sendRedirect("/verifyPassword");
         }
+    }
+
+    public String generateVerificationCode() {
+        Random random = new Random();
+        int i = random.nextInt(100000, 900000);
+        return String.valueOf(i);
     }
 }

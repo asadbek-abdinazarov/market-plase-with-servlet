@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm py-3">
   <div class="container-fluid">
     <a class="navbar-brand" href="/home" style="font-weight: bold; color: #4e54c8;">Home</a>
@@ -6,9 +7,11 @@
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/product/list" style="font-weight: 500; color: #333; transition: color 0.3s;">Products</a>
-        </li>
+        <c:if test="${requestScope.userRole eq 'ADMIN'}">
+          <li class="nav-item">
+            <a class="nav-link" href="/product/list" style="font-weight: 500; color: #333; transition: color 0.3s;">Products</a>
+          </li>
+        </c:if>
         <li class="nav-item">
           <a class="nav-link" href="/contacts" style="font-weight: 500; color: #333; transition: color 0.3s;">Contacts</a>
         </li>

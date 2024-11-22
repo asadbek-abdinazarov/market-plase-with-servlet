@@ -3,11 +3,14 @@ package javachi.biz.marketplaseservlet.servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import javachi.biz.marketplaseservlet.dao.AuthUserDAO;
 
 import java.io.IOException;
 
 @WebServlet(name = "HomeServlet", value = "/home")
 public class HomeServlet extends HttpServlet {
+    private final AuthUserDAO authUserDAO = new AuthUserDAO();
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -22,10 +25,16 @@ public class HomeServlet extends HttpServlet {
             }
         }
         if (value != null) {
-            req.setAttribute("user", value);
-            req.getRequestDispatcher("/views/home.jsp").forward(req, resp);
+            authUserDAO.findByEmail(value).ifPresent(authUser -> {
+                req.setAttribute("user", authUser.getEmail());
+                req.setAttribute("userRole", authUser.getRole());
+                try {
+                    req.getRequestDispatcher("/views/home.jsp").forward(req, resp);
+                } catch (ServletException | IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         } else {
             resp.sendRedirect("/auth/login");
-        }
-    }
+        }}
 }

@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -60,6 +61,9 @@
 
 <div class="container">
     <h1>Register</h1>
+    <c:if test="${error_verification != null}">
+        <span class="text-danger">${error_verification}</span>
+    </c:if>
     <form action="/auth/register" method="post">
         <div class="mb-3">
             <label for="f_name" class="form-label">First name</label>

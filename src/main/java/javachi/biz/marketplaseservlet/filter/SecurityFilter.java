@@ -20,6 +20,7 @@ public class SecurityFilter implements Filter {
     private static final List<String> WHITE_LIST = List.of(
             "/",
             "/product/list",
+            "/verifyPassword",
             "/auth/login",
             "/auth/register"
     );

@@ -11,6 +11,7 @@
             margin: 0;
             padding: 0;
         }
+
         .container {
             max-width: 500px;
             margin-top: 80px;
@@ -19,38 +20,46 @@
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
+
         h1 {
             color: #4e54c8;
             font-weight: bold;
             text-align: center;
             margin-bottom: 30px;
         }
+
         .form-label {
             color: #333;
             font-weight: bold;
         }
+
         .form-control {
             box-shadow: none;
             border-radius: 5px;
         }
+
         .btn {
             width: 100%;
             padding: 10px;
             font-weight: bold;
         }
+
         .btn-success {
             background-color: #4e54c8;
             border: none;
         }
+
         .btn-warning {
             background-color: #ffc107;
             color: #333;
             border: none;
             margin-top: 10px;
         }
+
         .btn:hover {
             opacity: 0.9;
         }
+
         .text-danger {
             font-size: 0.9em;
         }
@@ -60,6 +69,12 @@
 <jsp:include page="/fragment/navbar.jsp"/>
 <div class="container mt-5">
     <h1>Login</h1>
+    <c:if test="${email_message != null}">
+        <span class="text-warning">${email_message}</span>
+    </c:if>
+    <c:if test="${status_error != null}">
+        <span class="text-danger">${status_error}</span>
+    </c:if>
     <form action="/auth/login" method="post">
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
